@@ -12,6 +12,11 @@ from preprocess_charger_detail import drop_na
 
 
 def time_list(time1, time2):
+    """
+    得到时间的列表
+    time1，time2分别为开始时刻和结束时刻
+    返回type为str的时间列表
+    """
     time_list = []
     while time1 <= time2:
         #time_list.append(datetime.datetime.strptime(time1.strftime('%H:%M:%S'), '%H:%M:%S'))
@@ -20,19 +25,24 @@ def time_list(time1, time2):
     return time_list
 
 def power_distribute(df, cols):
+    """
+    计算一段时间范围内每一个时刻对应的功率
+    df为给定带时间的功率表
+    cols为一段时间的时间列表
+    """
     df_power = pd.DataFrame(index=cols)
     t_list = []
     func =  lambda x:parser.parse(x).time()
     for t in cols:
         t_list.append(func(t))
-    df_power['time'] = t_list
+    df_power['time'] = t_list #获得type为datetime的时间列表
     df['date'] = df['time_start'].apply(str)
-    df['date'] = df['date'].apply(lambda x:x[:10])
+    df['date'] = df['date'].apply(lambda x:x[:10])#取日期
     for i in range(len(df)):
         res1 = df.iloc[i]['time_start'].time() <= df_power['time']
         res2 = df_power['time'] <= df.iloc[i]['time_end'].time()
-        df_power[i] = res1 & res2
-        df_power[i] = df_power[i] * df.iloc[i]['out_power']
+        df_power[i] = res1 & res2#在时间范围内的值为1，否则为0
+        df_power[i] = df_power[i] * df.iloc[i]['out_power']#得到对应时刻的功率
         #df.iloc[i]['date'] = df.iloc[i]['date'].date()
 
     df_power = df_power.drop('time', axis=1)
@@ -46,7 +56,7 @@ def power_distribute(df, cols):
     
 def calc_power(data):
     data = data[:]
-    
+    #清洗数据
     data = drop_na(data, 'time_start')
     data = drop_na(data, 'time_end')
     data = data[data['time_start'] < data['time_end']]
@@ -119,9 +129,6 @@ def clustering_station_data(data, data_dir, year, first_time_dict, p_first_time_
     print('The numbers of the data clips is: %d'%len(data_gp.groups))
 
     for i in data_gp.groups:
-        first_time_dict[i] = False
-        p_first_time_dict[i] = False
-    for i in data_gp.groups:
         df = data_gp.get_group(i) #第i组
         print('NO.%d: '%num, i, df.shape)
         num += 1
@@ -134,7 +141,10 @@ def clustering_station_data(data, data_dir, year, first_time_dict, p_first_time_
         filename = os.path.join(data_dir, 'P_%s_%s.csv'%(i, year))
         #附加模式，重复运行会产生重复数据
         df.to_csv(filename, header=p_first_time_dict[i], mode='a', encoding='gb18030')
-    
+
+        first_time_dict[i] = False#下一次附加文件不写header
+        p_first_time_dict[i] = False
+        
 if __name__ == '__main__':
     data_dir = os.path.join(os.path.abspath('.'), 'data')
     p_data_dir = os.path.join(os.path.abspath('.'), 'processed_data')
@@ -144,7 +154,7 @@ if __name__ == '__main__':
     first_time_dict = {}
     p_first_time_dict = {}
     for i in station_info['station_id']:
-        first_time_dict[i] = True
+        first_time_dict[i] = True#每一份文件第一次写后变为false
         p_first_time_dict[i] = True
     for file in os.listdir(data_dir):#获取文件夹内所有文件名
         if file_name in file:

@@ -44,7 +44,7 @@ for year in years:
     sql_cmd = "select count (*) from his_chargdata "\
                 "where RecEndTime between '%s-01-01' and '%s-12-31'" % (year, year)
 
-    cursor.execute(sql_cmd)
+    cursor.execute(sql_cmd)#获取数据行数
     row = cursor.fetchall()
     count[year] = row[0][0]
     print('the length of data_%s is: %d' %(year, count[year]))
@@ -53,13 +53,13 @@ close_connection(conn)
 
 conn = create_connection(config, as_dict=True)
 cursor = conn.cursor()
-max_row = 500000
+max_row = 500000#最大写入文件行数
 for year in years:
     sql_cmd = "select * from his_chargdata "\
                 "where RecEndTime between '%s-01-01' and '%s-12-31'" % (year, year)
     cursor.execute(sql_cmd)
     time = 0
-    while count[year] > 0:
+    while count[year] > 0:#还有数据未写入文件
         rows = cursor.fetchmany(max_row)
         df = pd.DataFrame(rows)
         file_name = 'data\%s_%s_%d.csv'%('his_chargdata', year, time)

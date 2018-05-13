@@ -7,7 +7,7 @@ Created on Tue May  8 16:28:18 2018
 import sql_operation as so
 import pandas as pd
 
-num = 10000
+num = 10000#每次读10000条数据
 sql = so.Sql('chargingdb')
 sql.create_connection(as_dict=True)
 rows = {}
