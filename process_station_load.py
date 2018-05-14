@@ -74,19 +74,23 @@ def calc_load(data_dir, file, data=None):
 if __name__ == '__main__':
     data_dir = os.path.join(os.path.abspath('.'), 'processed_data')
     p_data_dir = os.path.join(os.path.abspath('.'), 'load_data')
-    year = '2017'
-    file_name = r'P_\w+\_%s.csv'%year
-    load_data = pd.DataFrame()
-    for file in os.listdir(data_dir):#获取文件夹内所有文件名
-        if re.search(file_name, file):
-            data_ori = read_csv_file(data_dir, file)
-            data_ori = data_ori.drop(['index', 'charger_id'], axis=1)
-            #analyse_data(data_ori)
-            if len(data_ori) > 100:
-                data = process_data(data_ori)
-                print(len(data))
-                data.to_csv(os.path.join(p_data_dir, 'L_'+file), encoding='gb18030')
-                
-                load_data = load_data.append(calc_load(p_data_dir, 'L_'+file,
-                                                       data=data))
-    load_data.to_csv(os.path.join(p_data_dir, 'Loads_%s'%year), encoding='gb18030')
+    years = ['2017']
+    first_time = True
+    for year in years:
+        file_name = r'P_\w+\_%s.csv'%year
+        load_data = pd.DataFrame()
+        for file in os.listdir(data_dir):#获取文件夹内所有文件名
+            if re.search(file_name, file):
+                data_ori = read_csv_file(data_dir, file)
+                data_ori = data_ori.drop(['index', 'charger_id'], axis=1)
+                #analyse_data(data_ori)
+                if len(data_ori) > 100:
+                    data = process_data(data_ori)
+                    print(len(data))
+                    data.to_csv(os.path.join(p_data_dir, 'L_'+file), encoding='gb18030')
+                    
+                    load_data = load_data.append(calc_load(p_data_dir, 'L_'+file,
+                                                           data=data))
+        load_data.to_csv(os.path.join(p_data_dir, 'Loads.csv'), mode='a',
+                                 header=first_time, encoding='gb18030')
+        first_time = False
