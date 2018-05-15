@@ -37,7 +37,7 @@ def calc_load(data_dir, file, data=None):
     s = re.match(r'(\w\_\w)_(\w+)_(\d+\.csv)', file)
     station_id = s.group(2)
     print('calculate the load_data of station %s.'%station_id)
-    year = data['date'].iloc[0][:4]
+    year = data['date'].iloc[1][:4]
     data = data.drop('date', axis=1)
     cols = data.columns.tolist()
     paras = ['mean_', 'median_', 'max_', 'min_', 'std_', '25%_', '75%_', \

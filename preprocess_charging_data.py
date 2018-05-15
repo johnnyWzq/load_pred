@@ -148,7 +148,7 @@ def clustering_station_data(data, data_dir, year, first_time_dict, p_first_time_
 if __name__ == '__main__':
     data_dir = os.path.join(os.path.abspath('.'), 'data')
     p_data_dir = os.path.join(os.path.abspath('.'), 'processed_data')
-    year = '2017'
+    year = '2016'
     file_name = 'his_chargdata_%s'%year
     station_info = read_csv_file(p_data_dir, 'processed_charger_info.csv')
     first_time_dict = {}
