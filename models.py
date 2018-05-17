@@ -30,9 +30,9 @@ def detect_k(data):
     P = dendrogram(Z, 0) #画谱系聚类图
     plt.show()
     
-def build_cluster_model(data, k):
+def build_cluster_model(data, k, linkage):
     
-    model = AgglomerativeClustering(n_clusters=k, linkage='ward')
+    model = AgglomerativeClustering(n_clusters=k, linkage=linkage)
     model.fit(data)
     
     r = pd.concat([data, pd.Series(model.labels_, index=data.index)], axis=1)
@@ -47,8 +47,11 @@ if __name__ == '__main__':
     data_std, stations = standard_data(data_ori)
     #detect_k(data_std)
     k = 4
-    result = build_cluster_model(data_std, k)
+    linkage = 'complete'#'ward', 'average', 'complete'
+    result = build_cluster_model(data_std, k, linkage)
     result['station_id'] = stations
+    res = result[['station_id', '聚类类别']]
+    res.to_excel(os.path.join(data_dir, '%s_cluster_stations.xlsx'%linkage))
     xy_dict = {}
     res_gp = result.groupby('聚类类别')
     for i in res_gp.groups:
@@ -56,4 +59,4 @@ if __name__ == '__main__':
         xy_dict[k] = res_gp.get_group(i)
         xy_dict[k] = xy_dict[k].drop(['聚类类别', 'station_id'], axis=1)
         
-    draw_loads_type(xy_dict, 'loads_', data_dir)
+    draw_loads_type(xy_dict, '%s_loads_'%linkage, data_dir)

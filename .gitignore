@@ -6,3 +6,4 @@ load_data/
 processed_data/
 load_pic/
 !load_data/Loads.csv
+!processed_data/stations_info.xlsx
