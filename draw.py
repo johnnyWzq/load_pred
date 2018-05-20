@@ -14,6 +14,8 @@ from dateutil import parser
 import re
 from matplotlib.gridspec import GridSpec
 from matplotlib.dates import HourLocator, MinuteLocator
+from functools import reduce
+
 from preprocess_charging_data import time_list
 
 def sel_station(data, num):
@@ -86,7 +88,7 @@ def draw_loads(xy_dict, file_name, data_dir):
     fig.savefig(os.path.join(data_dir, '%s.jpg'%file_name), dpi=128)
     fig.show()
     
-def draw_loads_type(xy_dict, file_name, data_dir):
+def draw_loads_type(xy_dict, file_name, data_dir, *args):
     fig = plt.figure(edgecolor='k',figsize=(16, 28))
     plt.rcParams['font.sans-serif'] = ['SimHei'] #用来正常显示中文标签
     plt.rcParams['axes.unicode_minus'] = False #用来正常显示负号
@@ -106,6 +108,8 @@ def draw_loads_type(xy_dict, file_name, data_dir):
         y_max = xy[list(map(lambda x:'max_'+x, cols))]
         y_25 = xy[list(map(lambda x:'25%_'+x, cols))]
         y_75 = xy[list(map(lambda x:'75%_'+x, cols))]
+        y_diff = xy[list(map(lambda x:'diff_'+x, cols))]
+        y_diff2 = xy[list(map(lambda x:'diff2_'+x, cols))]
 
         x = pd.to_datetime(cols, format='%H:%M:%S')
         first_time = True
@@ -114,20 +118,40 @@ def draw_loads_type(xy_dict, file_name, data_dir):
             print('drawing the part%d of %s picture...'%(cnt, file_name))
             if first_time:
                 ax = plt.subplot(gs[ax_num, 0], facecolor='#383737')
-                ax.plot(x, y_mean.iloc[cnt], label='平均负载')
-                ax.plot(x, y_max.iloc[cnt], color='silver', label='最大负载')
-                ax.plot(x, y_median.iloc[cnt], label='中位数负载')
-                ax.plot(x, y_25.iloc[cnt], label='25%位负载')
-                ax.plot(x, y_75.iloc[cnt], label='75%位负载')
+                if 'mean' in args:
+                    ax.plot(x, y_mean.iloc[cnt], color='r', label='平均负载')
+                if 'max' in args:
+                    ax.plot(x, y_max.iloc[cnt], color='g',label='最大负载')
+                if 'median' in args:
+                    ax.plot(x, y_median.iloc[cnt], color='y',label='中位数负载')
+                if '25%' in args:
+                    ax.plot(x, y_25.iloc[cnt], color='c',label='25%位负载')
+                if '75%' in args:
+                    ax.plot(x, y_75.iloc[cnt], color='m',label='75%位负载')
+                if 'diff' in args:
+                    ax.plot(x, y_diff.iloc[cnt], color='b',label='负载一阶导')
+                if 'diff2' in args:
+                    ax.plot(x, y_diff2.iloc[cnt], color='silver',label='负载二阶导')
                 ax.legend(loc='upper right')
+                
                 first_time = False
             else:
                 ax = plt.subplot(gs[ax_num, 0], facecolor='#383737')
-                ax.plot(x, y_mean.iloc[cnt])
-                ax.plot(x, y_max.iloc[cnt])
-                ax.plot(x, y_median.iloc[cnt])
-                ax.plot(x, y_25.iloc[cnt])
-                ax.plot(x, y_75.iloc[cnt])
+                if 'mean' in args:
+                    ax.plot(x, y_mean.iloc[cnt], color='r', label='平均负载')
+                if 'max' in args:
+                    ax.plot(x, y_max.iloc[cnt], color='g',label='最大负载')
+                if 'median' in args:
+                    ax.plot(x, y_median.iloc[cnt], color='y',label='中位数负载')
+                if '25%' in args:
+                    ax.plot(x, y_25.iloc[cnt], color='c',label='25%位负载')
+                if '75%' in args:
+                    ax.plot(x, y_75.iloc[cnt], color='m',label='75%位负载')
+                if 'diff' in args:
+                    ax.plot(x, y_diff.iloc[cnt], color='b',label='负载一阶导')
+                if 'diff2' in args:
+                    ax.plot(x, y_diff2.iloc[cnt], color='silver',label='负载二阶导')
+                
         ax.grid(linestyle=':') #开启网格
         ax.set_ylabel('负荷功率 (kwh)')
         ax.set_title('%s场站24小时负荷曲线'%k)
@@ -137,7 +161,7 @@ def draw_loads_type(xy_dict, file_name, data_dir):
         ax.xaxis.set_major_formatter(dt.DateFormatter('%H:%M:%S'))
 
         ax_num += 1
-        
+    file_name += '_' + reduce(lambda x,y:x+'_'+y, [s for s in args])
     fig.autofmt_xdate()
     fig.savefig(os.path.join(data_dir, '%s.jpg'%file_name), dpi=128)
     fig.show()

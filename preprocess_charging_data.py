@@ -73,7 +73,7 @@ def read_csv_file(data_dir, file_name):
     print('reading the %s...'%file_name)
     data = pd.read_csv(os.path.join(data_dir, file_name), error_bad_lines=False,
                                     encoding='gb18030')
-    print('The lengths of the data is: %d'%len(data))
+    print('The shape of the data is: %s'%str(data.shape))
     return data
 
 def analyse_data(df):
