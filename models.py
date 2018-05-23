@@ -68,7 +68,7 @@ if __name__ == '__main__':
     
     res = stations_info_type(res, os.path.join(os.path.join(os.path.abspath('.'), 'processed_data'),
                                               'stations_info.xlsx'))
-    #res.to_excel(os.path.join(p_data_dir, '%s_cluster_stations_%s.xlsx'%(linkage, method)))
+    res.to_excel(os.path.join(p_data_dir, '%s_cluster_stations_%s.xlsx'%(linkage, method)))
     
     xy_dict = {}
     res_gp = data_ori.groupby('聚类类别')

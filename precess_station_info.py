@@ -60,6 +60,7 @@ def merge_station_info(stations0, stations1):
         ac_charger_num = len(df['charger_type'][df['charger_type'] == '交流'])
         dc_charger_num = len(df['charger_type'][df['charger_type'] == '直流'])
         df = df.head(1)
+        df['operation_time'] = df.iloc[0]['operation_time'][:11]
         df['power'] = power_total
         df['ac_charger_num'] = ac_charger_num
         df['dc_charger_num'] = dc_charger_num
