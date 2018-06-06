@@ -69,9 +69,10 @@ if __name__ == '__main__':
         xy_dict[k] = xy_dict[k].drop(['聚类类别', 'station_id'], axis=1)
 
     draw_loads_type(xy_dict, '%s_loads_'%linkage, p_data_dir,
-             'mean', \
-             'median', \
-             'max', \
+             'fixed',\
+             #'mean', \
+             #'median', \
+             #'max', \
              #'min', \
              #'25%', \
              #'75%', \

@@ -96,6 +96,7 @@ def draw_loads_type(xy_dict, file_name, data_dir, *args):
     ax_num = len(xy_dict)
     gs = GridSpec(ax_num, 1)
     ax_num = 0
+    #fixed = []
     for k, xy in xy_dict.items():
         file_name += '_%s'%k 
         print('calculating the data of axis_y...')
@@ -110,7 +111,7 @@ def draw_loads_type(xy_dict, file_name, data_dir, *args):
         y_75 = xy[list(map(lambda x:'75%_'+x, cols))]
         y_diff = xy[list(map(lambda x:'diff_'+x, cols))]
         y_diff2 = xy[list(map(lambda x:'diff2_'+x, cols))]
-
+            
         x = pd.to_datetime(cols, format='%H:%M:%S')
         first_time = True
         for cnt in range(len(xy)):
@@ -132,6 +133,9 @@ def draw_loads_type(xy_dict, file_name, data_dir, *args):
                     ax.plot(x, y_diff.iloc[cnt], color='b',label='负载一阶导')
                 if 'diff2' in args:
                     ax.plot(x, y_diff2.iloc[cnt], color='silver',label='负载二阶导')
+                if 'fixed' in args:
+                    ax.fill_between(x, 0, y_mean.iloc[cnt], color='g', alpha=0.3, label='平均负载')
+                    
                 ax.legend(loc='upper right')
                 
                 first_time = False
@@ -151,7 +155,8 @@ def draw_loads_type(xy_dict, file_name, data_dir, *args):
                     ax.plot(x, y_diff.iloc[cnt], color='b',label='负载一阶导')
                 if 'diff2' in args:
                     ax.plot(x, y_diff2.iloc[cnt], color='silver',label='负载二阶导')
-                
+                if 'fixed' in args:
+                    ax.fill_between(x, 0, y_mean.iloc[cnt], color='g', alpha=0.3, label='平均负载')
         ax.grid(linestyle=':') #开启网格
         ax.set_ylabel('负荷功率 (kwh)')
         ax.set_title('%s场站24小时负荷曲线'%k)
